@@ -35,6 +35,7 @@ repository for v1.x.
 * Code to create device- and service-profiles on upgrade from v0.14.0 has been removed.
 * Code to migrate the device-queue on upgrade from v0.15.0 has been removed.
 * Code to create gateway-profiles on upgrade from v0.20.0 has been removed.
+* Old unused tables (kept for upgrade migration code) have been removed from db.
 
 ## 0.21.1
 
