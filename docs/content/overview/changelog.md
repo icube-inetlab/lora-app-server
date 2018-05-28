@@ -14,10 +14,10 @@ This marks the first stable release!
 
 ### Upgrade notes
 
-* First make sure you have v0.21.1 installed
+* First make sure you have v0.21.1 installed and running (together with LoRa Server v0.26.3).
 * As some configuration defaults have been changed (in the MQTT topic `node`
   has been replaced by `device`), make sure the old defaults are in you config
-  file. To re-generate a configuration while keeping your modifications, run:
+  file. To re-generate a configuration file while keeping your modifications, run:
   ```bash
   lora-app-server -c lora-app-server-old.toml configfile > lora-app-server.toml
   ```
