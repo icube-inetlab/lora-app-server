@@ -26,6 +26,7 @@ const (
 	lppHumiditySensor    byte = 104
 	lppAccelerometer     byte = 113
 	lppBarometer         byte = 115
+	lppUnixtime          byte = 133
 	lppGyrometer         byte = 134
 	lppGPSLocation       byte = 136
 )
@@ -63,6 +64,7 @@ type CayenneLPP struct {
 	HumiditySensor    map[byte]float64       `json:"humiditySensor,omitempty" influxdb:"humidity_sensor"`
 	Accelerometer     map[byte]Accelerometer `json:"accelerometer,omitempty" influxdb:"accelerometer"`
 	Barometer         map[byte]float64       `json:"barometer,omitempty" influxdb:"barometer"`
+	Unixtime          map[byte]uint32        `json:"unixTime,omitempty" influxdb:"unixtime"`
 	Gyrometer         map[byte]Gyrometer     `json:"gyrometer,omitempty" influxdb:"gyrometer"`
 	GPSLocation       map[byte]GPSLocation   `json:"gpsLocation,omitempty" influxdb:"gps_location"`
 }
@@ -110,6 +112,8 @@ func (c *CayenneLPP) DecodeBytes(data []byte) error {
 			err = lppBarometerDecode(buf[0], r, c)
 		case lppGyrometer:
 			err = lppGyrometerDecode(buf[0], r, c)
+		case lppUnixtime:
+			err = lppUnixtimeDecode(buf[0], r, c)
 		case lppGPSLocation:
 			err = lppGPSLocationDecode(buf[0], r, c)
 		default:
@@ -175,6 +179,11 @@ func (c CayenneLPP) EncodeToBytes() ([]byte, error) {
 	}
 	for k, v := range c.Barometer {
 		if err := lppBarometerEncode(k, w, v); err != nil {
+			return nil, err
+		}
+	}
+	for k, v := range c.Unixtime {
+		if err := lppUnixtimeEncode(k, w, v); err != nil {
 			return nil, err
 		}
 	}
@@ -401,6 +410,26 @@ func lppBarometerEncode(channel uint8, w io.Writer, data float64) error {
 	w.Write([]byte{channel, lppBarometer})
 	if err := binary.Write(w, binary.BigEndian, uint16(data*10)); err != nil {
 		return errors.Wrap(err, "write uint16 error")
+	}
+	return nil
+}
+
+func lppUnixtimeDecode(channel uint8, r io.Reader, out *CayenneLPP) error {
+	var utime uint32
+	if err := binary.Read(r, binary.BigEndian, &utime); err != nil {
+		return errors.Wrap(err, "read uint32 error")
+	}
+	if out.Unixtime == nil {
+		out.Unixtime = make(map[uint8]uint32)
+	}
+	out.Unixtime[channel] = utime
+	return nil
+}
+
+func lppUnixtimeEncode(channel uint8, w io.Writer, data uint32) error {
+	w.Write([]byte{channel, lppUnixtime})
+	if err := binary.Write(w, binary.BigEndian, data); err != nil {
+		return errors.Wrap(err, "write uint32 error")
 	}
 	return nil
 }

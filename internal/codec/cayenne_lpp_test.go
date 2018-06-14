@@ -115,6 +115,16 @@ func TestCayenneLPPDecode(t *testing.T) {
 				},
 			},
 			{
+				Name:  "2 unixtime",
+				Bytes: []byte{3, 133, 91, 34, 110, 179, 5, 133, 91, 34, 110, 213},
+				Struct: CayenneLPP{
+					Unixtime: map[byte]uint32{
+						3: 1528983219,
+						5: 1528983253,
+					},
+				},
+			},
+			{
 				Name:  "2 gyrometer sensors",
 				Bytes: []byte{3, 134, 0, 1, 0, 2, 0, 3, 5, 134, 3, 233, 7, 210, 11, 187},
 				Struct: CayenneLPP{
